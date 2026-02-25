@@ -67,7 +67,7 @@ export default function App() {
         <div className="flex items-center justify-between px-4 h-14">
           {/* Brand */}
           <div className="leading-none shrink-0">
-            <p style={{fontFamily: "'Unbounded', sans-serif", background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}} className="text-xl font-black leading-none tracking-tight">APLV</p>
+            <p style={{fontFamily: "'Unbounded', sans-serif", background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #a78bfa 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text'}} className="text-xl font-black leading-none tracking-tight mr-2">APLV</p>
           </div>
 
           {/* Search + count */}
