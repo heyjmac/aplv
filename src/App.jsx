@@ -241,7 +241,7 @@ export default function App() {
         </aside>
 
         {/* ── Product grid ── */}
-        <main className="flex-1 p-5 pb-20">
+        <main className="flex-1 p-5 pb-20 overflow-y-auto">
           {filtered.length === 0 ? (
             <div className="text-center mt-20 text-slate-400 select-none">
               <p className="text-4xl mb-3">🔍</p>
