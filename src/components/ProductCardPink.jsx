@@ -87,8 +87,10 @@ function Modal({ product, open, onClose }) {
 
   const unknown = useMemo(() => {
     const alergens = !!alergicos;
-    const ingreds = !!(descricao_ingredientes || ingredientes);
-    return !alergens && !ingreds;
+    const ingreds = !!(ingredientes || descricao_ingredientes);
+    const unknown = !alergens && !ingreds;
+    console.log('Unknown check:', { alergicos, ingredientes, descricao_ingredientes, alergens, ingreds, unknown });
+    return unknown;
   }, [alergicos, descricao_ingredientes, ingredientes]);
 
   return (
@@ -135,7 +137,7 @@ function Modal({ product, open, onClose }) {
                 )}
                 <div className="mb-4 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs text-slate-600">
                   <div className="font-medium text-slate-700">Ingredientes:</div>
-                  <div>{(descricao_ingredientes || ingredientes || '').trim() ? (descricao_ingredientes || ingredientes) : 'Não informado'}</div>
+                  <div>{(ingredientes || descricao_ingredientes || '').trim() ? (ingredientes || descricao_ingredientes) : 'Não informado'}</div>
                   <div className="font-medium text-slate-700 mt-1">Alérgicos:</div>
                   <div>{(alergicos || '').trim() ? alergicos : 'Não informado'}</div>
                 </div>
@@ -161,10 +163,11 @@ function Modal({ product, open, onClose }) {
                   { key: 'origem_animal', label: 'Origem animal', icon: ATTR_ICONS.origem_animal, has: atributos.origem_animal, may: atributos.pode_conter_origem_animal },
                 ].map(({ key, label, icon, has, may }) => {
                   let value = '';
-                  if (has === true) value = 'sim';
+                  if (unknown) value = '?';
+                  else if (has === true) value = 'sim';
                   else if (may === true) value = 'talvez';
                   else value = 'não';
-                  let type = has === true ? 'contains' : may === true ? 'traces' : 'free';
+                  let type = unknown ? 'traces': has === true ? 'contains' : may === true ? 'traces' : 'free';
                   return (
                     <AttributeRow key={key} icon={icon} name={label} value={value} type={type} />
                   );
