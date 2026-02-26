@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-// import produtos from './content/produtos2.json'; // carregado dinamicamente abaixo
+// import produtos from './content/produtos.json'; // carregado dinamicamente abaixo
 import Filters from './components/FiltersPink';
 import ProductCard from './components/ProductCardPink';
 
@@ -61,7 +61,7 @@ export default function App() {
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    import('./content/produtos2.json')
+    import('./content/produtos.json')
       .then(mod => {
         if (!cancelled) setProdutos(mod.default || mod);
       })
