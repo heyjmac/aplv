@@ -71,7 +71,6 @@ function AttributeRow({ icon, name, value, type }) {
 }
 
 function Modal({ product, open, onClose }) {
-  if (!open) return null;
   const { nome, imagem, marca, categoria, descricao, url, origem, ingredientes, descricao_ingredientes, alergicos, atributos } = product;
   const [mounted, setMounted] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false); // State for description expansion
@@ -136,7 +135,7 @@ function Modal({ product, open, onClose }) {
                         endIdx = idxAler;
                       }
                       const cleanDesc = endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
-                      const limit = 150;
+                      const limit = 190;
                       const isLong = cleanDesc.length > limit;
 
                       if (!isLong || showFullDesc) {
@@ -403,7 +402,7 @@ export default function ProductCard({ product }) {
           </div>
         </div>
       </button>
-      <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} />
+      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} />}
     </>
   );
 }
