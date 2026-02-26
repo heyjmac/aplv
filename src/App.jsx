@@ -87,6 +87,21 @@ export default function App() {
 
   const filtered = useMemo(() => {
     return produtos.filter(p => {
+      // Determine if product information is unknown
+      const isUnknown = !p.alergicos && !(p.ingredientes || p.descricao_ingredientes);
+      
+      // If any specific dietary filter is active, exclude unknown products
+      const hasActiveDietaryFilter = 
+        filters.sem_ovos || filters.sem_carne || filters.sem_gluten || filters.sem_leite ||
+        filters.sem_origem_animal || filters.sem_soja || filters.sem_amendoim || filters.sem_castanhas ||
+        filters.sem_peixe || filters.sem_crustaceos || 
+        filters.sem_tracos_leite || filters.sem_tracos_ovos || filters.sem_tracos_carne || 
+        filters.sem_tracos_gluten || filters.sem_tracos_soja || filters.sem_tracos_amendoim || 
+        filters.sem_tracos_castanhas || filters.sem_tracos_peixe || filters.sem_tracos_crustaceos || 
+        filters.sem_tracos_origem_animal;
+
+      if (isUnknown && hasActiveDietaryFilter) return false;
+
       if (filters.search && !p?.nome.toLowerCase().includes(filters.search.toLowerCase())) return false;
       if (filters.empresa && p.marca !== filters.empresa) return false;
       if (filters.categoria && p.categoria !== filters.categoria) return false;
