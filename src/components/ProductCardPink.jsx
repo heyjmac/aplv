@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import santaluzia from '../assets/santaluzia.png';
 
+const getProxiedImage = (url) => {
+  if (!url) return '';
+  const newUrl = url.replace('vteximg.com.br', 'vtexassets.com').replace('vteximg.com', 'vtexassets.com');
+  return `https://storetheme.vtexassets.com/unsafe/200x200/center/middle/${encodeURIComponent(newUrl)}`;
+};
+
 const ATTR_ICONS = {
   leite_ou_derivados: '🥛',
   contem_ovos: '🥚',
@@ -186,7 +192,7 @@ function Modal({ product, open, onClose, onFilterByBrand }) {
                 </div>
               </div>
               <div>
-                <img src={imagem} alt={nome} className="w-full min-w-[240px] h-48 md:h-60 object-contain rounded-xl shadow-sm" />
+                <img src={getProxiedImage(imagem)} alt={nome} className="w-full min-w-[240px] h-48 md:h-60 object-contain rounded-xl shadow-sm" />
               </div>
             </div>
 
@@ -323,7 +329,7 @@ export default function ProductCard({ product, onFilterByBrand }) {
         {/* Image */}
         <div className="relative bg-slate-50 flex items-center justify-center p-4" style={{height: '200px'}}>
           <img
-            src={imagem}
+            src={getProxiedImage(imagem)}
             alt={nome}
             loading="lazy"
             className="max-h-full max-w-full object-contain group-hover:scale-105 transition-transform duration-300"
