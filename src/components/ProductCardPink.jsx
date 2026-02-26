@@ -70,7 +70,7 @@ function AttributeRow({ icon, name, value, type }) {
   );
 }
 
-function Modal({ product, open, onClose }) {
+function Modal({ product, open, onClose, onFilterByBrand }) {
   const { nome, imagem, marca, categoria, descricao, url, origem, ingredientes, descricao_ingredientes, alergicos, atributos } = product;
   const [mounted, setMounted] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false); // State for description expansion
@@ -119,7 +119,17 @@ function Modal({ product, open, onClose }) {
                   ))}
                   {categoria && <span className="text-xs text-slate-500">{categoria}</span>}
                 </div>
-                {marca && <div className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3">{marca}</div>}
+                {marca && (
+                  <div
+                    className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3 cursor-pointer hover:underline"
+                    onClick={() => {
+                      if (onFilterByBrand) onFilterByBrand(marca);
+                      onClose();
+                    }}
+                  >
+                    {marca}
+                  </div>
+                )}
                 {descricao && (
                   <div className="mb-3 text-sm text-slate-700 whitespace-pre-line">
                     {(() => {
@@ -224,7 +234,7 @@ function Modal({ product, open, onClose }) {
   );
 }
 
-export default function ProductCard({ product }) {
+export default function ProductCard({ product, onFilterByBrand }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { nome, imagem, marca, descricao, url, origem, atributos, alergicos, ingredientes, descricao_ingredientes } = product;
 
@@ -402,7 +412,7 @@ export default function ProductCard({ product }) {
           </div>
         </div>
       </button>
-      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} />}
+      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} onFilterByBrand={onFilterByBrand} />}
     </>
   );
 }
