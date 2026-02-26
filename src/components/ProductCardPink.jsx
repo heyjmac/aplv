@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import santaluzia from '../assets/santaluzia.png';
 
 const ATTR_ICONS = {
   leite_ou_derivados: '🥛',
@@ -177,10 +178,9 @@ function Modal({ product, open, onClose }) {
               </div>
             </div>
 
-            <div className="flex flex-col gap-2 mt-5 sticky bottom-0 pt-3 bg-white z-10">
+            <div className="flex flex-col items-end mr-4 gap-2 sticky bottom-0 pt-3 bg-white z-10">
               <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
-                <img src="/santaluzia.png" alt="Santa Luzia" className="w-5 h-5" />
-                Ver no Santa Luzia
+                Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
               </a>
               {/* Disclaimer discreto, amarelo, no footer */}
               <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 text-center font-normal opacity-80">
