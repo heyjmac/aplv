@@ -59,7 +59,7 @@ function ValueBadge({ type, children }) {
 
 function AttributeRow({ icon, name, value, type }) {
   return (
-    <div className="flex items-center justify-between gap-3 text-sm py-2">
+    <div className="flex items-center justify-between gap-3 text-sm py-1">
       <div className="flex items-center gap-2 min-w-0">
         <span className="shrink-0">{icon}</span>
         <span className="font-medium text-slate-700 truncate">{name}</span>
@@ -115,7 +115,24 @@ function Modal({ product, open, onClose }) {
                   {categoria && <span className="text-xs text-slate-500">{categoria}</span>}
                 </div>
                 {marca && <div className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3">{marca}</div>}
-                {descricao && <div className="mb-3 text-sm text-slate-700 whitespace-pre-line">{descricao}</div>}
+                {descricao && (
+                  <div className="mb-3 text-sm text-slate-700 whitespace-pre-line">
+                    {(() => {
+                      // Remove everything after 'Ingredientes:' or 'Alérgicos:'
+                      const idxIng = descricao.indexOf('Ingredientes:');
+                      const idxAler = descricao.indexOf('Alérgicos:');
+                      let endIdx = -1;
+                      if (idxIng !== -1 && idxAler !== -1) {
+                        endIdx = Math.min(idxIng, idxAler);
+                      } else if (idxIng !== -1) {
+                        endIdx = idxIng;
+                      } else if (idxAler !== -1) {
+                        endIdx = idxAler;
+                      }
+                      return endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
+                    })()}
+                  </div>
+                )}
                 <div className="mb-4 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs text-slate-600">
                   <div className="font-medium text-slate-700">Ingredientes:</div>
                   <div>{(descricao_ingredientes || ingredientes || '').trim() ? (descricao_ingredientes || ingredientes) : 'Não informado'}</div>
@@ -130,27 +147,28 @@ function Modal({ product, open, onClose }) {
 
             <div>
               <div className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Atributos</div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4">
-                <AttributeRow icon={ATTR_ICONS.leite_ou_derivados} name="Contém leite" value={atributos.leite_ou_derivados ? 'Sim' : 'Não'} type={atributos.leite_ou_derivados ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.leite_ou_derivados} name="Pode conter leite" value={unknown || atributos.pode_conter_leite_ou_derivados ? 'Sim' : 'Não'} type={atributos.pode_conter_leite_ou_derivados ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_ovos} name="Contém ovos" value={atributos.contem_ovos ? 'Sim' : 'Não'} type={atributos.contem_ovos ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_ovos} name="Pode conter ovos" value={unknown ||atributos.pode_conter_ovos ? 'Sim' : 'Não'} type={atributos.pode_conter_ovos ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_carne} name="Contém carne" value={atributos.contem_carne ? 'Sim' : 'Não'} type={atributos.contem_carne ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_carne} name="Pode conter carne" value={unknown || atributos.pode_conter_carne ? 'Sim' : 'Não'} type={atributos.pode_conter_carne ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_gluten} name="Contém glúten" value={atributos.contem_gluten ? 'Sim' : 'Não'} type={atributos.contem_gluten ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_gluten} name="Pode conter glúten" value={unknown || atributos.pode_conter_gluten ? 'Sim' : 'Não'} type={atributos.pode_conter_gluten ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_soja} name="Contém soja" value={atributos.contem_soja ? 'Sim' : 'Não'} type={atributos.contem_soja ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_soja} name="Pode conter soja" value={unknown || atributos.pode_conter_soja ? 'Sim' : 'Não'} type={atributos.pode_conter_soja ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_amendoim} name="Contém amendoim" value={atributos.contem_amendoim ? 'Sim' : 'Não'} type={atributos.contem_amendoim ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_amendoim} name="Pode conter amendoim" value={unknown || atributos.pode_conter_amendoim ? 'Sim' : 'Não'} type={atributos.pode_conter_amendoim ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_castanhas} name="Contém castanhas" value={atributos.contem_castanhas ? 'Sim' : 'Não'} type={atributos.contem_castanhas ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_castanhas} name="Pode conter castanhas" value={unknown || atributos.pode_conter_castanhas ? 'Sim' : 'Não'} type={atributos.pode_conter_castanhas ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_peixe} name="Contém peixe" value={atributos.contem_peixe ? 'Sim' : 'Não'} type={atributos.contem_peixe ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_peixe} name="Pode conter peixe" value={unknown || atributos.pode_conter_peixe ? 'Sim' : 'Não'} type={atributos.pode_conter_peixe ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_crustaceos} name="Contém crustáceos" value={atributos.contem_crustaceos ? 'Sim' : 'Não'} type={atributos.contem_crustaceos ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.contem_crustaceos} name="Pode conter crustáceos" value={unknown || atributos.pode_conter_crustaceos ? 'Sim' : 'Não'} type={atributos.pode_conter_crustaceos ? 'traces' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.origem_animal} name="Origem animal" value={atributos.origem_animal ? 'Sim' : 'Não'} type={atributos.origem_animal ? 'contains' : 'free'} />
-                <AttributeRow icon={ATTR_ICONS.origem_animal} name="Pode conter origem animal" value={unknown || atributos.pode_conter_origem_animal ? 'Sim' : 'Não'} type={atributos.pode_conter_origem_animal ? 'traces' : 'free'} />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-16">
+                {[
+                  { key: 'leite_ou_derivados', label: 'Contém leite', icon: ATTR_ICONS.leite_ou_derivados, has: atributos.leite_ou_derivados, may: atributos.pode_conter_leite_ou_derivados },
+                  { key: 'contem_ovos', label: 'Contém ovos', icon: ATTR_ICONS.contem_ovos, has: atributos.contem_ovos, may: atributos.pode_conter_ovos },
+                  { key: 'contem_carne', label: 'Contém carne', icon: ATTR_ICONS.contem_carne, has: atributos.contem_carne, may: atributos.pode_conter_carne },
+                  { key: 'contem_gluten', label: 'Contém glúten', icon: ATTR_ICONS.contem_gluten, has: atributos.contem_gluten, may: atributos.pode_conter_gluten },
+                  { key: 'contem_soja', label: 'Contém soja', icon: ATTR_ICONS.contem_soja, has: atributos.contem_soja, may: atributos.pode_conter_soja },
+                  { key: 'contem_amendoim', label: 'Contém amendoim', icon: ATTR_ICONS.contem_amendoim, has: atributos.contem_amendoim, may: atributos.pode_conter_amendoim },
+                  { key: 'contem_castanhas', label: 'Contém castanhas', icon: ATTR_ICONS.contem_castanhas, has: atributos.contem_castanhas, may: atributos.pode_conter_castanhas },
+                  { key: 'contem_peixe', label: 'Contém peixe', icon: ATTR_ICONS.contem_peixe, has: atributos.contem_peixe, may: atributos.pode_conter_peixe },
+                  { key: 'contem_crustaceos', label: 'Contém crustáceos', icon: ATTR_ICONS.contem_crustaceos, has: atributos.contem_crustaceos, may: atributos.pode_conter_crustaceos },
+                  { key: 'origem_animal', label: 'Origem animal', icon: ATTR_ICONS.origem_animal, has: atributos.origem_animal, may: atributos.pode_conter_origem_animal },
+                ].map(({ key, label, icon, has, may }) => {
+                  let value = '';
+                  if (has === true) value = 'sim';
+                  else if (may === true) value = 'talvez';
+                  else value = 'não';
+                  let type = has === true ? 'contains' : may === true ? 'traces' : 'free';
+                  return (
+                    <AttributeRow key={key} icon={icon} name={label} value={value} type={type} />
+                  );
+                })}
               </div>
             </div>
 
