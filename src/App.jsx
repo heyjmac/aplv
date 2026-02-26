@@ -12,7 +12,18 @@ const ATTRIBUTE_CHIPS = [
   { key: 'sem_tracos_carne', label: 'Sem traços de carne' },
   { key: 'sem_gluten', label: 'Sem glúten' },
   { key: 'sem_tracos_gluten', label: 'Sem traços de glúten' },
+  { key: 'sem_soja', label: 'Sem soja' },
+  { key: 'sem_tracos_soja', label: 'Sem traços de soja' },
+  { key: 'sem_amendoim', label: 'Sem amendoim' },
+  { key: 'sem_tracos_amendoim', label: 'Sem traços de amendoim' },
+  { key: 'sem_castanhas', label: 'Sem castanhas' },
+  { key: 'sem_tracos_castanhas', label: 'Sem traços de castanhas' },
+  { key: 'sem_peixe', label: 'Sem peixe' },
+  { key: 'sem_tracos_peixe', label: 'Sem traços de peixe' },
+  { key: 'sem_crustaceos', label: 'Sem crustáceos' },
+  { key: 'sem_tracos_crustaceos', label: 'Sem traços de crustáceos' },
   { key: 'sem_origem_animal', label: 'Sem origem animal' },
+  { key: 'sem_tracos_origem_animal', label: 'Sem traços de origem animal' },
 ];
 
 const INITIAL_FILTERS = {
@@ -24,10 +35,21 @@ const INITIAL_FILTERS = {
   sem_gluten: false,
   sem_leite: true,
   sem_origem_animal: false,
+  sem_soja: false,
+  sem_amendoim: false,
+  sem_castanhas: false,
+  sem_peixe: false,
+  sem_crustaceos: false,
   sem_tracos_leite: false,
   sem_tracos_ovos: false,
   sem_tracos_carne: false,
   sem_tracos_gluten: false,
+  sem_tracos_soja: false,
+  sem_tracos_amendoim: false,
+  sem_tracos_castanhas: false,
+  sem_tracos_peixe: false,
+  sem_tracos_crustaceos: false,
+  sem_tracos_origem_animal: false,
 };
 
 export default function App() {
@@ -53,16 +75,52 @@ export default function App() {
       if (filters.sem_gluten && p.atributos.contem_gluten !== false) return false;
       if (filters.sem_leite && p.atributos.leite_ou_derivados !== false) return false;
       if (filters.sem_origem_animal && p.atributos.origem_animal !== false) return false;
+      if (filters.sem_soja && p.atributos.contem_soja !== false) return false;
+      if (filters.sem_amendoim && p.atributos.contem_amendoim !== false) return false;
+      if (filters.sem_castanhas && p.atributos.contem_castanhas !== false) return false;
+      if (filters.sem_peixe && p.atributos.contem_peixe !== false) return false;
+      if (filters.sem_crustaceos && p.atributos.contem_crustaceos !== false) return false;
       if (filters.sem_tracos_leite && p.atributos.pode_conter_leite_ou_derivados !== false) return false;
       if (filters.sem_tracos_ovos && p.atributos.pode_conter_ovos !== false) return false;
       if (filters.sem_tracos_carne && p.atributos.pode_conter_carne !== false) return false;
       if (filters.sem_tracos_gluten && p.atributos.pode_conter_gluten !== false) return false;
+      if (filters.sem_tracos_soja && p.atributos.pode_conter_soja !== false) return false;
+      if (filters.sem_tracos_amendoim && p.atributos.pode_conter_amendoim !== false) return false;
+      if (filters.sem_tracos_castanhas && p.atributos.pode_conter_castanhas !== false) return false;
+      if (filters.sem_tracos_peixe && p.atributos.pode_conter_peixe !== false) return false;
+      if (filters.sem_tracos_crustaceos && p.atributos.pode_conter_crustaceos !== false) return false;
+      if (filters.sem_tracos_origem_animal && p.atributos.pode_conter_origem_animal !== false) return false;
       return true;
     });
   }, [filters]);
 
   function handleChange(key, value) {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters(prev => {
+      const next = { ...prev, [key]: value };
+      const traceToBase = {
+        sem_tracos_leite: 'sem_leite',
+        sem_tracos_ovos: 'sem_ovos',
+        sem_tracos_carne: 'sem_carne',
+        sem_tracos_gluten: 'sem_gluten',
+        sem_tracos_soja: 'sem_soja',
+        sem_tracos_amendoim: 'sem_amendoim',
+        sem_tracos_castanhas: 'sem_castanhas',
+        sem_tracos_peixe: 'sem_peixe',
+        sem_tracos_crustaceos: 'sem_crustaceos',
+        sem_tracos_origem_animal: 'sem_origem_animal',
+      };
+      const baseToTrace = Object.fromEntries(Object.entries(traceToBase).map(([t, b]) => [b, t]));
+
+      // If enabling a 'traces' filter, force-enable its base filter
+      if (traceToBase[key] && value) {
+        next[traceToBase[key]] = true;
+      }
+      // If disabling a base filter, force-disable its 'traces' filter
+      if (baseToTrace[key] && value === false) {
+        next[baseToTrace[key]] = false;
+      }
+      return next;
+    });
   }
 
   const hasActiveFilters =
@@ -107,8 +165,7 @@ export default function App() {
 
 
         {/* Chips row — desktop */}
-        <div className="hidden md:flex items-center gap-3 px-4 pb-2 border-t border-slate-100">
-          <span className="text-[0.65rem] font-semibold text-slate-400 uppercase tracking-wider shrink-0">Atributos</span>
+        <div className="hidden md:flex items-center gap-3 px-4 pb-2">
           <div className="flex items-center gap-2 flex-wrap">
             {ATTRIBUTE_CHIPS.map(({ key, label }) => (
               <button
@@ -136,7 +193,6 @@ export default function App() {
 
         {/* Mobile category row */}
         <div className="md:hidden flex items-center gap-2 px-4 pb-2 border-t border-slate-100 pt-2">
-          <span className="text-[0.65rem] font-semibold text-slate-400 uppercase tracking-wider shrink-0">Cat.</span>
           <select
             value={filters.categoria}
             onChange={e => handleChange('categoria', e.target.value)}

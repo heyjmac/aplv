@@ -77,28 +77,7 @@ export default function Filters({ filters, companies, categories, onChange, onRe
           </div>
         </div>
       )}
-      {/* Traços de filtros */}
-      <div className='mt-5'>
-        <SectionTitle>Traços de</SectionTitle>
-        <div className="flex flex-col gap-2">
-          <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={filters.sem_tracos_leite} onChange={e => onChange('sem_tracos_leite', e.target.checked)} />
-            Sem traços de leite
-          </label>
-          <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={filters.sem_tracos_ovos} onChange={e => onChange('sem_tracos_ovos', e.target.checked)} />
-            Sem traços de ovos
-          </label>
-          <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={filters.sem_tracos_carne} onChange={e => onChange('sem_tracos_carne', e.target.checked)} />
-            Sem traços de carne
-          </label>
-          <label className="flex items-center gap-2 text-xs">
-            <input type="checkbox" checked={filters.sem_tracos_gluten} onChange={e => onChange('sem_tracos_gluten', e.target.checked)} />
-            Sem traços de glúten
-          </label>
-        </div>
-      </div>
+      
     </div>
   );
 }
