@@ -93,35 +93,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Category row — desktop */}
-        <div className="hidden md:flex items-center gap-3 px-4 pb-2 border-t border-slate-100">
-          <span className="text-[0.65rem] font-semibold text-slate-400 uppercase tracking-wider shrink-0">Categoria</span>
-          <div className="flex items-center gap-2 flex-wrap">
-            <button
-              onClick={() => handleChange('categoria', '')}
-              className={`px-3 py-1 text-xs font-medium rounded-full border transition-all ${
-                !filters.categoria
-                  ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                  : 'bg-white border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-500'
-              }`}
-            >
-              Todas
-            </button>
-            {categories.map(cat => (
-              <button
-                key={cat}
-                onClick={() => handleChange('categoria', filters.categoria === cat ? '' : cat)}
-                className={`px-3 py-1 text-xs font-medium rounded-full border transition-all ${
-                  filters.categoria === cat
-                    ? 'bg-indigo-600 border-indigo-600 text-white shadow-sm'
-                    : 'bg-white border-slate-300 text-slate-500 hover:border-indigo-400 hover:text-indigo-500'
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Chips row — desktop */}
         <div className="hidden md:flex items-center gap-3 px-4 pb-2 border-t border-slate-100">
@@ -187,7 +158,7 @@ export default function App() {
       <div className="md:flex md:items-start">
         {/* ── Sidebar ── */}
         <aside
-          className="bg-white border-b border-slate-200 md:border-b-0 md:border-r md:sticky md:top-[11.5rem] md:h-[calc(100vh-11.5rem)] md:overflow-y-auto md:w-60 md:shrink-0 hidden md:block"
+          className="bg-white border-b border-slate-200 md:border-b-0 md:border-r md:sticky md:top-0 md:h-screen md:overflow-y-auto md:w-60 md:shrink-0 hidden md:block"
         >
           <Filters
             filters={filters}
