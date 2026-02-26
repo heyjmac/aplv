@@ -196,7 +196,9 @@ function Modal({ product, open, onClose }) {
 
 export default function ProductCard({ product }) {
   const [modalOpen, setModalOpen] = useState(false);
-  const { nome, imagem, marca, descricao, url, origem, atributos } = product;
+  const { nome, imagem, marca, descricao, url, origem, atributos, alergicos, ingredientes, descricao_ingredientes } = product;
+
+  const unknown = !alergicos && !(ingredientes || descricao_ingredientes);
 
   // Chips para leite
   let leiteType = null, leiteTooltip = '';
@@ -304,6 +306,12 @@ export default function ProductCard({ product }) {
 
           {/* Pills */}
           <div className="flex flex-wrap gap-1.5 mt-auto pt-3">
+            {unknown ? (
+              ['Leite', 'Ovos', 'Carne', 'Glúten', 'Soja', 'Amendoim', 'Castanhas', 'Peixe', 'Crustáceos'].map(label => (
+                <Pill key={label} type="traces" label={label} tooltip="Informação indisponível" />
+              ))
+            ) : (
+              <>
             {/* Leite */}
             {leiteType === 'contains'
               ? <Pill type="contains" label={"Leite"} tooltip={leiteTooltip} />
@@ -359,6 +367,8 @@ export default function ProductCard({ product }) {
               : (crustaceosTracosType === 'traces'
                   ? <Pill type="traces" label={"Crustáceos"} tooltip={crustaceosTracosTooltip} />
                   : crustaceosType && <Pill type={crustaceosType} label={"Crustáceos"} tooltip={crustaceosTooltip} />)}
+              </>
+            )}
           </div>
         </div>
       </button>
