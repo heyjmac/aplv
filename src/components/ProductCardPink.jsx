@@ -149,7 +149,7 @@ function Modal({ product, open, onClose, onFilterByBrand }) {
               <div>
                 <h2 id="product-title" className="text-lg font-bold text-slate-900 leading-snug mb-1">{nome}</h2>
                 <div className="flex items-center gap-2 mb-2">
-                  {origem && origem.map((o, i) => (
+                  {origem && origem.filter(o => o !== 'Importado').map((o, i) => (
                     <span key={i} title={o} className="text-2xl leading-none">{ORIGIN_FLAGS[o] || '🏳️'}</span>
                   ))}
                   {categoria && <span className="text-xs text-slate-500">{categoria}</span>}
@@ -368,7 +368,7 @@ export default function ProductCard({ product, onFilterByBrand }) {
         {/* Body */}
         <div className="p-4 flex flex-col gap-1.5 flex-1 border-t border-slate-100">
           <div className="flex items-center gap-2 mb-1">
-            {origem && origem.map((o, i) => (
+            {origem && origem.filter(o => o !== 'Importado').map((o, i) => (
               <span key={i} title={o} className="text-xl">{ORIGIN_FLAGS[o] || '🏳️'}</span>
             ))}
             {marca && (
