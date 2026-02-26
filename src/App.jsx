@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import produtos from './content/produtos2.json';
+import { useState, useMemo, useEffect } from 'react';
+// import produtos from './content/produtos2.json'; // carregado dinamicamente abaixo
 import Filters from './components/FiltersPink';
 import ProductCard from './components/ProductCardPink';
 
@@ -54,16 +54,36 @@ const INITIAL_FILTERS = {
 
 export default function App() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
+  const [produtos, setProdutos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    import('./content/produtos2.json')
+      .then(mod => {
+        if (!cancelled) setProdutos(mod.default || mod);
+      })
+      .catch(err => {
+        console.error('Erro ao carregar produtos:', err);
+        if (!cancelled) setError('Falha ao carregar produtos');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
 
   const companies = useMemo(() => {
     const set = new Set(produtos.map(p => p.marca).filter(Boolean));
     return [...set].sort();
-  }, []);
+  }, [produtos]);
 
   const categories = useMemo(() => {
     const set = new Set(produtos.map(p => p.categoria).filter(Boolean));
     return [...set].sort();
-  }, []);
+  }, [produtos]);
 
   const filtered = useMemo(() => {
     return produtos.filter(p => {
@@ -92,7 +112,7 @@ export default function App() {
       if (filters.sem_tracos_origem_animal && p.atributos.pode_conter_origem_animal !== false) return false;
       return true;
     });
-  }, [filters]);
+  }, [filters, produtos]);
 
   function handleChange(key, value) {
     setFilters(prev => {
@@ -242,7 +262,16 @@ export default function App() {
 
         {/* ── Product grid ── */}
         <main className="flex-1 p-5 pb-20 overflow-y-auto">
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="flex flex-col items-center justify-center h-40 text-slate-500">
+              <span className="inline-block w-6 h-6 border-2 border-slate-300 border-t-indigo-500 rounded-full animate-spin mb-2"></span>
+              <p className="text-xs">Carregando produtos…</p>
+            </div>
+          ) : error ? (
+            <div className="text-center mt-20 text-red-400 select-none">
+              <p className="text-sm">Falha ao carregar produtos. Tente novamente.</p>
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center mt-20 text-slate-400 select-none">
               <p className="text-4xl mb-3">🔍</p>
               <p className="text-sm">Nenhum produto encontrado.</p>
