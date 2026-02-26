@@ -110,7 +110,7 @@ function Modal({ product, open, onClose }) {
         <div className="flex flex-col">
           {/* Content panel (left on desktop) */}
           <div className="p-6 overflow-y-auto max-h-[70vh] pr-2">
-             <div className='flex flex-col md:flex-row'>
+            <div className='flex flex-col-reverse md:flex-row gap-y-6'>
               <div>
                 <h2 id="product-title" className="text-lg font-bold text-slate-900 leading-snug mb-1">{nome}</h2>
                 <div className="flex items-center gap-2 mb-2">
