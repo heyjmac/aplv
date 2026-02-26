@@ -74,6 +74,7 @@ function Modal({ product, open, onClose }) {
   if (!open) return null;
   const { nome, imagem, marca, categoria, descricao, url, origem, ingredientes, descricao_ingredientes, alergicos, atributos } = product;
   const [mounted, setMounted] = useState(false);
+  const [showFullDesc, setShowFullDesc] = useState(false); // State for description expansion
   useEffect(() => {
     setMounted(true);
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -134,7 +135,37 @@ function Modal({ product, open, onClose }) {
                       } else if (idxAler !== -1) {
                         endIdx = idxAler;
                       }
-                      return endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
+                      const cleanDesc = endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
+                      const limit = 150;
+                      const isLong = cleanDesc.length > limit;
+
+                      if (!isLong || showFullDesc) {
+                        return (
+                          <>
+                            {cleanDesc}
+                            {isLong && (
+                              <button
+                                onClick={() => setShowFullDesc(false)}
+                                className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap"
+                              >
+                                Ver menos
+                              </button>
+                            )}
+                          </>
+                        );
+                      }
+
+                      return (
+                        <>
+                          {cleanDesc.slice(0, limit)}...
+                          <button
+                            onClick={() => setShowFullDesc(true)}
+                            className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap"
+                          >
+                            Ver mais
+                          </button>
+                        </>
+                      );
                     })()}
                   </div>
                 )}
