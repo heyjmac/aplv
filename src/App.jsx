@@ -158,7 +158,7 @@ export default function App() {
       <div className="md:flex md:items-start">
         {/* ── Sidebar ── */}
         <aside
-          className="bg-white border-b border-slate-200 md:border-b-0 md:border-r md:sticky md:top-0 md:h-screen md:overflow-y-auto md:w-60 md:shrink-0 hidden md:block"
+          className="bg-white border-b border-slate-200 md:border-b-0 md:border-r md:sticky md:top-0 md:h-screen md:overflow-y-auto md:w-60 md:shrink-0 md:pb-[60px] hidden md:block"
         >
           <Filters
             filters={filters}
