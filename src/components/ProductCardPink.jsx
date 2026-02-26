@@ -109,8 +109,8 @@ function Modal({ product, open, onClose }) {
 
         <div className="flex flex-col">
           {/* Content panel (left on desktop) */}
-          <div className="p-6 overflow-y-auto max-h-[70vh] pr-2">
-            <div className='flex flex-col-reverse md:flex-row gap-y-6'>
+          <div className="overflow-y-auto max-h-[70vh] pr-2">
+            <div className='p-6 pb-0 flex flex-col-reverse md:flex-row gap-y-6'>
               <div>
                 <h2 id="product-title" className="text-lg font-bold text-slate-900 leading-snug mb-1">{nome}</h2>
                 <div className="flex items-center gap-2 mb-2">
@@ -150,7 +150,7 @@ function Modal({ product, open, onClose }) {
               </div>
             </div>
 
-            <div>
+            <div className='p-6 pt-0'>
               <div className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Atributos</div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-16">
                 {[
@@ -178,7 +178,7 @@ function Modal({ product, open, onClose }) {
               </div>
             </div>
 
-            <div className="flex flex-col items-end mr-4 gap-2 sticky bottom-0 pt-3 bg-white z-10">
+            <div className="pb-2 flex flex-col items-end pr-4 gap-2 sticky bottom-0 pt-3 bg-white z-10 border-t border-slate-200 bg-white">
               <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
                 Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
               </a>
