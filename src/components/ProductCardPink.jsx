@@ -5,7 +5,7 @@ const ATTR_ICONS = {
   contem_gluten: '🌾',
 };
 
-function Pill({ type, label }) {
+function Pill({ type, label, tooltip }) {
   // type: 'free' | 'contains' | 'traces'
   let colorClass = '';
   let icon = '';
@@ -17,10 +17,14 @@ function Pill({ type, label }) {
     icon = '✓'; // invertido: vermelho com V
   } else if (type === 'traces') {
     colorClass = 'bg-amber-50 text-amber-700 border-amber-100';
-    icon = '⚠️';
+    icon = '?';
   }
   return (
-    <span className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2.5 py-1 leading-none border ${colorClass}`}>
+    <span
+      className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2.5 py-1 leading-none border ${colorClass}`}
+      title={tooltip}
+      style={{ cursor: 'help' }}
+    >
       {icon} {label}
     </span>
   );
@@ -30,36 +34,36 @@ export default function ProductCard({ product }) {
   const { nome, imagem, marca, descricao, atributos, url } = product;
 
   // Chips para leite
-  let leiteType = null;
-  if (atributos.leite_ou_derivados === false) leiteType = 'free';
-  else if (atributos.leite_ou_derivados === true) leiteType = 'contains';
-  let leiteTracosType = null;
-  if (atributos.pode_conter_leite_ou_derivados === true) leiteTracosType = 'traces';
-  else if (atributos.pode_conter_leite_ou_derivados === false) leiteTracosType = 'free';
+  let leiteType = null, leiteTooltip = '';
+  if (atributos.leite_ou_derivados === false) { leiteType = 'free'; leiteTooltip = 'Sem leite'; }
+  else if (atributos.leite_ou_derivados === true) { leiteType = 'contains'; leiteTooltip = 'Contém leite'; }
+  let leiteTracosType = null, leiteTracosTooltip = '';
+  if (atributos.pode_conter_leite_ou_derivados === true) { leiteTracosType = 'traces'; leiteTracosTooltip = 'Pode conter leite'; }
+  else if (atributos.pode_conter_leite_ou_derivados === false) { leiteTracosType = 'free'; leiteTracosTooltip = 'Sem traços de leite'; }
 
   // Chips para ovos
-  let ovosType = null;
-  if (atributos.contem_ovos === false) ovosType = 'free';
-  else if (atributos.contem_ovos === true) ovosType = 'contains';
-  let ovosTracosType = null;
-  if (atributos.pode_conter_ovos === true) ovosTracosType = 'traces';
-  else if (atributos.pode_conter_ovos === false) ovosTracosType = 'free';
+  let ovosType = null, ovosTooltip = '';
+  if (atributos.contem_ovos === false) { ovosType = 'free'; ovosTooltip = 'Sem ovos'; }
+  else if (atributos.contem_ovos === true) { ovosType = 'contains'; ovosTooltip = 'Contém ovos'; }
+  let ovosTracosType = null, ovosTracosTooltip = '';
+  if (atributos.pode_conter_ovos === true) { ovosTracosType = 'traces'; ovosTracosTooltip = 'Pode conter ovos'; }
+  else if (atributos.pode_conter_ovos === false) { ovosTracosType = 'free'; ovosTracosTooltip = 'Sem traços de ovos'; }
 
   // Chips para carne
-  let carneType = null;
-  if (atributos.contem_carne === false) carneType = 'free';
-  else if (atributos.contem_carne === true) carneType = 'contains';
-  let carneTracosType = null;
-  if (atributos.pode_conter_carne === true) carneTracosType = 'traces';
-  else if (atributos.pode_conter_carne === false) carneTracosType = 'free';
+  let carneType = null, carneTooltip = '';
+  if (atributos.contem_carne === false) { carneType = 'free'; carneTooltip = 'Sem carne'; }
+  else if (atributos.contem_carne === true) { carneType = 'contains'; carneTooltip = 'Contém carne'; }
+  let carneTracosType = null, carneTracosTooltip = '';
+  if (atributos.pode_conter_carne === true) { carneTracosType = 'traces'; carneTracosTooltip = 'Pode conter carne'; }
+  else if (atributos.pode_conter_carne === false) { carneTracosType = 'free'; carneTracosTooltip = 'Sem traços de carne'; }
 
   // Chips para glúten
-  let glutenType = null;
-  if (atributos.contem_gluten === false) glutenType = 'free';
-  else if (atributos.contem_gluten === true) glutenType = 'contains';
-  let glutenTracosType = null;
-  if (atributos.pode_conter_gluten === true) glutenTracosType = 'traces';
-  else if (atributos.pode_conter_gluten === false) glutenTracosType = 'free';
+  let glutenType = null, glutenTooltip = '';
+  if (atributos.contem_gluten === false) { glutenType = 'free'; glutenTooltip = 'Sem glúten'; }
+  else if (atributos.contem_gluten === true) { glutenType = 'contains'; glutenTooltip = 'Contém glúten'; }
+  let glutenTracosType = null, glutenTracosTooltip = '';
+  if (atributos.pode_conter_gluten === true) { glutenTracosType = 'traces'; glutenTracosTooltip = 'Pode conter glúten'; }
+  else if (atributos.pode_conter_gluten === false) { glutenTracosType = 'free'; glutenTracosTooltip = 'Sem traços de glúten'; }
 
   return (
     <a
@@ -92,17 +96,21 @@ export default function ProductCard({ product }) {
         {/* Pills */}
         <div className="flex flex-wrap gap-1.5 mt-auto pt-3">
           {/* Leite */}
-          {leiteType && <Pill type={leiteType} label={"Leite"} />}
-          {leiteTracosType === 'traces' && <Pill type="traces" label="Traços de leite" />}
+          {leiteTracosType === 'traces'
+            ? <Pill type="traces" label={"Leite"} tooltip={leiteTracosTooltip} />
+            : leiteType && <Pill type={leiteType} label={"Leite"} tooltip={leiteTooltip} />}
           {/* Ovos */}
-          {ovosType && <Pill type={ovosType} label={"Ovos"} />}
-          {ovosTracosType === 'traces' && <Pill type="traces" label="Traços de ovos" />}
+          {ovosTracosType === 'traces'
+            ? <Pill type="traces" label={"Ovos"} tooltip={ovosTracosTooltip} />
+            : ovosType && <Pill type={ovosType} label={"Ovos"} tooltip={ovosTooltip} />}
           {/* Carne */}
-          {carneType && <Pill type={carneType} label={"Carne"} />}
-          {carneTracosType === 'traces' && <Pill type="traces" label="Traços de carne" />}
+          {carneTracosType === 'traces'
+            ? <Pill type="traces" label={"Carne"} tooltip={carneTracosTooltip} />
+            : carneType && <Pill type={carneType} label={"Carne"} tooltip={carneTooltip} />}
           {/* Glúten */}
-          {glutenType && <Pill type={glutenType} label={"Glúten"} />}
-          {glutenTracosType === 'traces' && <Pill type="traces" label="Traços de glúten" />}
+          {glutenTracosType === 'traces'
+            ? <Pill type="traces" label={"Glúten"} tooltip={glutenTracosTooltip} />
+            : glutenType && <Pill type={glutenType} label={"Glúten"} tooltip={glutenTooltip} />}
         </div>
       </div>
     </a>
