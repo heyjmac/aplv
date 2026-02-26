@@ -104,6 +104,8 @@ function Modal({ product, open, onClose }) {
       >
         <button onClick={onClose} className="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition" aria-label="Fechar">✕</button>
 
+
+
         <div className="flex flex-col">
           {/* Content panel (left on desktop) */}
           <div className="p-6 overflow-y-auto max-h-[70vh] pr-2">
@@ -175,11 +177,15 @@ function Modal({ product, open, onClose }) {
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-5 sticky bottom-0 pt-3 bg-white">
-              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">
-                <img src="https://www.santaluzia.com.br/favicon.ico" alt="Santa Luzia" className="w-5 h-5" />
+            <div className="flex flex-col gap-2 mt-5 sticky bottom-0 pt-3 bg-white z-10">
+              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
+                <img src="/santaluzia.png" alt="Santa Luzia" className="w-5 h-5" />
                 Ver no Santa Luzia
               </a>
+              {/* Disclaimer discreto, amarelo, no footer */}
+              <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 text-center font-normal opacity-80">
+                Sempre confira o rótulo do produto antes de consumir — as informações podem estar desatualizadas e formulações mudam sem aviso.
+              </div>
             </div>
           </div>
         </div>
@@ -223,6 +229,46 @@ export default function ProductCard({ product }) {
   let glutenTracosType = null, glutenTracosTooltip = '';
   if (atributos.pode_conter_gluten === true) { glutenTracosType = 'traces'; glutenTracosTooltip = 'Pode conter glúten'; }
   else if (atributos.pode_conter_gluten === false) { glutenTracosType = 'free'; glutenTracosTooltip = 'Sem traços de glúten'; }
+
+  // Chips para soja
+  let sojaType = null, sojaTooltip = '';
+  if (atributos.contem_soja === false) { sojaType = 'free'; sojaTooltip = 'Sem soja'; }
+  else if (atributos.contem_soja === true) { sojaType = 'contains'; sojaTooltip = 'Contém soja'; }
+  let sojaTracosType = null, sojaTracosTooltip = '';
+  if (atributos.pode_conter_soja === true) { sojaTracosType = 'traces'; sojaTracosTooltip = 'Pode conter soja'; }
+  else if (atributos.pode_conter_soja === false) { sojaTracosType = 'free'; sojaTracosTooltip = 'Sem traços de soja'; }
+
+  // Chips para amendoim
+  let amendoimType = null, amendoimTooltip = '';
+  if (atributos.contem_amendoim === false) { amendoimType = 'free'; amendoimTooltip = 'Sem amendoim'; }
+  else if (atributos.contem_amendoim === true) { amendoimType = 'contains'; amendoimTooltip = 'Contém amendoim'; }
+  let amendoimTracosType = null, amendoimTracosTooltip = '';
+  if (atributos.pode_conter_amendoim === true) { amendoimTracosType = 'traces'; amendoimTracosTooltip = 'Pode conter amendoim'; }
+  else if (atributos.pode_conter_amendoim === false) { amendoimTracosType = 'free'; amendoimTracosTooltip = 'Sem traços de amendoim'; }
+
+  // Chips para castanhas
+  let castanhasType = null, castanhasTooltip = '';
+  if (atributos.contem_castanhas === false) { castanhasType = 'free'; castanhasTooltip = 'Sem castanhas'; }
+  else if (atributos.contem_castanhas === true) { castanhasType = 'contains'; castanhasTooltip = 'Contém castanhas'; }
+  let castanhasTracosType = null, castanhasTracosTooltip = '';
+  if (atributos.pode_conter_castanhas === true) { castanhasTracosType = 'traces'; castanhasTracosTooltip = 'Pode conter castanhas'; }
+  else if (atributos.pode_conter_castanhas === false) { castanhasTracosType = 'free'; castanhasTracosTooltip = 'Sem traços de castanhas'; }
+
+  // Chips para peixe
+  let peixeType = null, peixeTooltip = '';
+  if (atributos.contem_peixe === false) { peixeType = 'free'; peixeTooltip = 'Sem peixe'; }
+  else if (atributos.contem_peixe === true) { peixeType = 'contains'; peixeTooltip = 'Contém peixe'; }
+  let peixeTracosType = null, peixeTracosTooltip = '';
+  if (atributos.pode_conter_peixe === true) { peixeTracosType = 'traces'; peixeTracosTooltip = 'Pode conter peixe'; }
+  else if (atributos.pode_conter_peixe === false) { peixeTracosType = 'free'; peixeTracosTooltip = 'Sem traços de peixe'; }
+
+  // Chips para crustáceos
+  let crustaceosType = null, crustaceosTooltip = '';
+  if (atributos.contem_crustaceos === false) { crustaceosType = 'free'; crustaceosTooltip = 'Sem crustáceos'; }
+  else if (atributos.contem_crustaceos === true) { crustaceosType = 'contains'; crustaceosTooltip = 'Contém crustáceos'; }
+  let crustaceosTracosType = null, crustaceosTracosTooltip = '';
+  if (atributos.pode_conter_crustaceos === true) { crustaceosTracosType = 'traces'; crustaceosTracosTooltip = 'Pode conter crustáceos'; }
+  else if (atributos.pode_conter_crustaceos === false) { crustaceosTracosType = 'free'; crustaceosTracosTooltip = 'Sem traços de crustáceos'; }
 
   return (
     <>
@@ -282,6 +328,37 @@ export default function ProductCard({ product }) {
               : (glutenTracosType === 'traces'
                   ? <Pill type="traces" label={"Glúten"} tooltip={glutenTracosTooltip} />
                   : glutenType && <Pill type={glutenType} label={"Glúten"} tooltip={glutenTooltip} />)}
+
+            {/* Soja */}
+            {sojaType === 'contains'
+              ? <Pill type="contains" label={"Soja"} tooltip={sojaTooltip} />
+              : (sojaTracosType === 'traces'
+                  ? <Pill type="traces" label={"Soja"} tooltip={sojaTracosTooltip} />
+                  : sojaType && <Pill type={sojaType} label={"Soja"} tooltip={sojaTooltip} />)}
+            {/* Amendoim */}
+            {amendoimType === 'contains'
+              ? <Pill type="contains" label={"Amendoim"} tooltip={amendoimTooltip} />
+              : (amendoimTracosType === 'traces'
+                  ? <Pill type="traces" label={"Amendoim"} tooltip={amendoimTracosTooltip} />
+                  : amendoimType && <Pill type={amendoimType} label={"Amendoim"} tooltip={amendoimTooltip} />)}
+            {/* Castanhas */}
+            {castanhasType === 'contains'
+              ? <Pill type="contains" label={"Castanhas"} tooltip={castanhasTooltip} />
+              : (castanhasTracosType === 'traces'
+                  ? <Pill type="traces" label={"Castanhas"} tooltip={castanhasTracosTooltip} />
+                  : castanhasType && <Pill type={castanhasType} label={"Castanhas"} tooltip={castanhasTooltip} />)}
+            {/* Peixe */}
+            {peixeType === 'contains'
+              ? <Pill type="contains" label={"Peixe"} tooltip={peixeTooltip} />
+              : (peixeTracosType === 'traces'
+                  ? <Pill type="traces" label={"Peixe"} tooltip={peixeTracosTooltip} />
+                  : peixeType && <Pill type={peixeType} label={"Peixe"} tooltip={peixeTooltip} />)}
+            {/* Crustáceos */}
+            {crustaceosType === 'contains'
+              ? <Pill type="contains" label={"Crustáceos"} tooltip={crustaceosTooltip} />
+              : (crustaceosTracosType === 'traces'
+                  ? <Pill type="traces" label={"Crustáceos"} tooltip={crustaceosTracosTooltip} />
+                  : crustaceosType && <Pill type={crustaceosType} label={"Crustáceos"} tooltip={crustaceosTooltip} />)}
           </div>
         </div>
       </button>
