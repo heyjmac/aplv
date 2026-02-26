@@ -1,13 +1,17 @@
 import { useState, useMemo } from 'react';
-import produtos from './content/produtos.json';
+import produtos from './content/produtos2.json';
 import Filters from './components/FiltersPink';
 import ProductCard from './components/ProductCardPink';
 
 const ATTRIBUTE_CHIPS = [
   { key: 'sem_leite', label: 'Sem leite' },
+  { key: 'sem_tracos_leite', label: 'Sem traços de leite' },
   { key: 'sem_ovos', label: 'Sem ovos' },
+  { key: 'sem_tracos_ovos', label: 'Sem traços de ovos' },
   { key: 'sem_carne', label: 'Sem carne' },
+  { key: 'sem_tracos_carne', label: 'Sem traços de carne' },
   { key: 'sem_gluten', label: 'Sem glúten' },
+  { key: 'sem_tracos_gluten', label: 'Sem traços de glúten' },
   { key: 'sem_origem_animal', label: 'Sem origem animal' },
 ];
 
@@ -20,13 +24,17 @@ const INITIAL_FILTERS = {
   sem_gluten: false,
   sem_leite: true,
   sem_origem_animal: false,
+  sem_tracos_leite: false,
+  sem_tracos_ovos: false,
+  sem_tracos_carne: false,
+  sem_tracos_gluten: false,
 };
 
 export default function App() {
   const [filters, setFilters] = useState(INITIAL_FILTERS);
 
   const companies = useMemo(() => {
-    const set = new Set(produtos.map(p => p.empresa?.nome).filter(Boolean));
+    const set = new Set(produtos.map(p => p.marca).filter(Boolean));
     return [...set].sort();
   }, []);
 
@@ -38,13 +46,17 @@ export default function App() {
   const filtered = useMemo(() => {
     return produtos.filter(p => {
       if (filters.search && !p?.nome.toLowerCase().includes(filters.search.toLowerCase())) return false;
-      if (filters.empresa && p.empresa?.nome !== filters.empresa) return false;
+      if (filters.empresa && p.marca !== filters.empresa) return false;
       if (filters.categoria && p.categoria !== filters.categoria) return false;
       if (filters.sem_ovos && p.atributos.contem_ovos !== false) return false;
       if (filters.sem_carne && p.atributos.contem_carne !== false) return false;
       if (filters.sem_gluten && p.atributos.contem_gluten !== false) return false;
       if (filters.sem_leite && p.atributos.leite_ou_derivados !== false) return false;
       if (filters.sem_origem_animal && p.atributos.origem_animal !== false) return false;
+      if (filters.sem_tracos_leite && p.atributos.pode_conter_leite_ou_derivados !== false) return false;
+      if (filters.sem_tracos_ovos && p.atributos.pode_conter_ovos !== false) return false;
+      if (filters.sem_tracos_carne && p.atributos.pode_conter_carne !== false) return false;
+      if (filters.sem_tracos_gluten && p.atributos.pode_conter_gluten !== false) return false;
       return true;
     });
   }, [filters]);

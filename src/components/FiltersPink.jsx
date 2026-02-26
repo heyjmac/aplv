@@ -32,9 +32,9 @@ export default function Filters({ filters, companies, categories, onChange, onRe
       {typeof total === 'number' && typeof filtered === 'number' && (
         <div className="text-xs text-slate-400">{filtered} de {total} produtos</div>
       )}
-      {/* Company */}
+      {/* Marca */}
       <div className='mt-5'>
-        <SectionTitle>Empresa</SectionTitle>
+        <SectionTitle>Marca</SectionTitle>
         <select
           className="w-full px-3 py-2 text-sm rounded-lg border border-slate-200 bg-slate-50 text-slate-700 focus:outline-none focus:border-indigo-400 focus:bg-white transition"
           value={filters.empresa}
@@ -77,6 +77,28 @@ export default function Filters({ filters, companies, categories, onChange, onRe
           </div>
         </div>
       )}
+      {/* Traços de filtros */}
+      <div className='mt-5'>
+        <SectionTitle>Traços de</SectionTitle>
+        <div className="flex flex-col gap-2">
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={filters.sem_tracos_leite} onChange={e => onChange('sem_tracos_leite', e.target.checked)} />
+            Sem traços de leite
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={filters.sem_tracos_ovos} onChange={e => onChange('sem_tracos_ovos', e.target.checked)} />
+            Sem traços de ovos
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={filters.sem_tracos_carne} onChange={e => onChange('sem_tracos_carne', e.target.checked)} />
+            Sem traços de carne
+          </label>
+          <label className="flex items-center gap-2 text-xs">
+            <input type="checkbox" checked={filters.sem_tracos_gluten} onChange={e => onChange('sem_tracos_gluten', e.target.checked)} />
+            Sem traços de glúten
+          </label>
+        </div>
+      </div>
     </div>
   );
 }
