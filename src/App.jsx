@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 // import produtos from './content/produtos.json'; // carregado dinamicamente abaixo
-import Filters from './components/FiltersPink';
-import ProductCard from './components/ProductCardPink';
+import Filters from './components/Filters';
+import ProductCard from './components/ProductCard';
 
 const ATTRIBUTE_CHIPS = [
   { key: 'sem_leite', label: 'Sem leite' },
