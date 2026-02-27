@@ -53,7 +53,22 @@ const INITIAL_FILTERS = {
 };
 
 export default function App() {
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  // Parse filters from URL
+  function parseFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const parsed = { ...INITIAL_FILTERS };
+    Object.keys(INITIAL_FILTERS).forEach(key => {
+      if (typeof INITIAL_FILTERS[key] === 'boolean') {
+        parsed[key] = params.get(key) === 'true';
+      } else {
+        const val = params.get(key);
+        if (val !== null) parsed[key] = val;
+      }
+    });
+    return parsed;
+  }
+
+  const [filters, setFilters] = useState(() => parseFiltersFromURL());
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -172,8 +187,26 @@ export default function App() {
       if (baseToTrace[key] && value === false) {
         next[baseToTrace[key]] = false;
       }
+
+      // Update URL
+      const params = new URLSearchParams();
+      Object.keys(next).forEach(k => {
+        if (typeof next[k] === 'boolean') {
+          if (next[k]) params.set(k, 'true');
+        } else if (next[k]) {
+          params.set(k, next[k]);
+        }
+      });
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+
       return next;
     });
+    // On mount, apply filters from URL if present
+    useEffect(() => {
+      setFilters(parseFiltersFromURL());
+      // eslint-disable-next-line
+    }, []);
   }
 
   const hasActiveFilters =
@@ -235,7 +268,10 @@ export default function App() {
             ))}
             {hasActiveFilters && (
               <button
-                onClick={() => setFilters(INITIAL_FILTERS)}
+                onClick={() => {
+                  setFilters(INITIAL_FILTERS);
+                  window.history.replaceState(null, '', window.location.pathname);
+                }}
                 className="px-3 py-1 text-xs font-medium rounded-full border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 transition"
               >
                 Limpar
