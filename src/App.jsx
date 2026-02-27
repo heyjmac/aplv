@@ -78,14 +78,14 @@ export default function App() {
     // List of filter keys to check, in order
     const filterKeys = ATTRIBUTE_CHIPS.map(chip => chip.key);
     const active = filterKeys.filter(key => filters[key]);
-    let title = 'APL-V | Busca de produtos hipoalergênicos';
+    let title = 'APLV - Busca de produtos hipoalergênicos';
     if (active.length > 0) {
       // Find label for first active filter
       const firstLabel = ATTRIBUTE_CHIPS.find(chip => chip.key === active[0])?.label || '';
       if (active.length === 1) {
-        title = `APL-V - Produtos ${firstLabel.toLowerCase()}`;
+        title = `APLV - Produtos ${firstLabel.toLowerCase()}`;
       } else {
-        title = `APL-V - Produtos ${firstLabel.toLowerCase()} & outros`;
+        title = `APLV - Produtos ${firstLabel.toLowerCase()} & outros`;
       }
     }
     document.title = title;
