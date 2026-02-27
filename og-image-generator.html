@@ -3,31 +3,73 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>APLV Chips</title>
+  <title>APL-V | Busca de produtos hipoalergênicos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Clash+Display:wght@600;700&family=Inter:wght@400;500;600&display=swap');
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #1a1a1a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       margin: 0;
+      padding: 0;
+      width: 1200px;
+      height: 630px;
+      background: linear-gradient(120deg, #ff6e7f 0%, #bfe9ff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .card {
-      background-color: white;
-      padding: 4rem;
-      border-radius: 1.5rem;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      width: 1100px;
+      height: 530px;
+      background: linear-gradient(120deg, #fff 0%, #f7f7fa 100%);
+      border-radius: 40px;
+      box-shadow: 0 12px 48px rgba(0,0,0,0.18);
       display: flex;
       flex-direction: column;
-      gap: 1rem;
-      width: 1200px; /* Target width for OG Image */
-      height: 630px; /* Target height for OG Image */
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      padding: 56px 40px;
+    }
+    .title {
+      color: #222;
+      font-size: 88px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 900;
+      margin-bottom: 40px;
+      text-align: center;
+      letter-spacing: 2.5px;
+      text-shadow: 0 4px 24px rgba(0,0,0,0.10);
+    }
+    .subtitle {
+      color: #ff6e7f;
+      font-size: 36px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      margin-bottom: 32px;
+      text-align: center;
+      letter-spacing: 1px;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 22px;
+      justify-content: center;
+    }
+    .chip {
+      font-family: 'Inter', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      padding: 18px 44px;
+      border-radius: 32px;
+      background: linear-gradient(90deg, #ff6e7f 0%, #bfe9ff 100%);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+      border: none;
+      letter-spacing: 1.2px;
+      transition: transform 0.2s;
+    }
+    .chip:hover {
+      transform: scale(1.04);
     }
 
     /* Copied Pill Styles */
@@ -95,7 +137,16 @@
 </head>
 <body>
 
-  <div class="card bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 border-8 border-white/20">
+  <div class="card">
+    <div class="title">APL-V</div>
+    <div class="subtitle">Busca de produtos hipoalergênicos</div>
+    <div class="chips">
+      <div class="chip" style="background: linear-gradient(90deg, #ff6e7f 0%, #ffb6b9 100%);">Sem leite</div>
+      <div class="chip" style="background: linear-gradient(90deg, #bfe9ff 0%, #ffdac1 100%);">Sem ovo</div>
+      <div class="chip" style="background: linear-gradient(90deg, #b5ead7 0%, #ff6e7f 100%);">Sem soja</div>
+      <div class="chip" style="background: linear-gradient(90deg, #ffdac1 0%, #b5ead7 100%);">Sem trigo</div>
+    </div>
+  </div>
     <div class="flex flex-col items-center gap-8 py-10">
       
       <div class="flex flex-wrap justify-center gap-4 max-w-4xl animate-pulse-slow">

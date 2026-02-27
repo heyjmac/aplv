@@ -53,10 +53,43 @@ const INITIAL_FILTERS = {
 };
 
 export default function App() {
-  const [filters, setFilters] = useState(INITIAL_FILTERS);
+  // Parse filters from URL
+  function parseFiltersFromURL() {
+    const params = new URLSearchParams(window.location.search);
+    const parsed = { ...INITIAL_FILTERS };
+    Object.keys(INITIAL_FILTERS).forEach(key => {
+      if (typeof INITIAL_FILTERS[key] === 'boolean') {
+        parsed[key] = params.get(key) === 'true';
+      } else {
+        const val = params.get(key);
+        if (val !== null) parsed[key] = val;
+      }
+    });
+    return parsed;
+  }
+
+  const [filters, setFilters] = useState(() => parseFiltersFromURL());
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // Dynamic title based on filters
+  useEffect(() => {
+    // List of filter keys to check, in order
+    const filterKeys = ATTRIBUTE_CHIPS.map(chip => chip.key);
+    const active = filterKeys.filter(key => filters[key]);
+    let title = 'APL-V | Busca de produtos hipoalergênicos';
+    if (active.length > 0) {
+      // Find label for first active filter
+      const firstLabel = ATTRIBUTE_CHIPS.find(chip => chip.key === active[0])?.label || '';
+      if (active.length === 1) {
+        title = `APL-V - Produtos ${firstLabel.toLowerCase()}`;
+      } else {
+        title = `APL-V - Produtos ${firstLabel.toLowerCase()} & outros`;
+      }
+    }
+    document.title = title;
+  }, [filters]);
 
   useEffect(() => {
     let cancelled = false;
@@ -154,8 +187,26 @@ export default function App() {
       if (baseToTrace[key] && value === false) {
         next[baseToTrace[key]] = false;
       }
+
+      // Update URL
+      const params = new URLSearchParams();
+      Object.keys(next).forEach(k => {
+        if (typeof next[k] === 'boolean') {
+          if (next[k]) params.set(k, 'true');
+        } else if (next[k]) {
+          params.set(k, next[k]);
+        }
+      });
+      const newUrl = `${window.location.pathname}?${params.toString()}`;
+      window.history.replaceState(null, '', newUrl);
+
       return next;
     });
+    // On mount, apply filters from URL if present
+    useEffect(() => {
+      setFilters(parseFiltersFromURL());
+      // eslint-disable-next-line
+    }, []);
   }
 
   const hasActiveFilters =
@@ -217,7 +268,10 @@ export default function App() {
             ))}
             {hasActiveFilters && (
               <button
-                onClick={() => setFilters(INITIAL_FILTERS)}
+                onClick={() => {
+                  setFilters(INITIAL_FILTERS);
+                  window.history.replaceState(null, '', window.location.pathname);
+                }}
                 className="px-3 py-1 text-xs font-medium rounded-full border border-slate-200 text-slate-400 hover:text-slate-600 hover:border-slate-300 transition"
               >
                 Limpar
