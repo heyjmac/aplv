@@ -1,6 +1,11 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
+    <script>
+      if (window.location.pathname === '/' && !window.location.search) {
+        window.location.replace('/?sem_leite=true');
+      }
+    </script>
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-BFWHZMFGKY"></script>
     <script>
