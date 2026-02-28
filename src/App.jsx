@@ -351,6 +351,7 @@ export default function App() {
                 <ProductCard
                   key={p.slug}
                   product={p}
+                  categories={categories}
                   onFilterByBrand={(brand) => setFilters(prev => ({ ...prev, empresa: brand, categoria: '' }))}
                 />
               ))}

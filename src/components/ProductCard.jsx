@@ -105,10 +105,35 @@ function AttributeRow({ icon, name, value, type }) {
   );
 }
 
-function Modal({ product, open, onClose, onFilterByBrand }) {
+function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
   const { nome, imagem, marca, categoria, descricao, url, origem, ingredientes, descricao_ingredientes, alergicos, atributos } = product;
   const [mounted, setMounted] = useState(false);
-  const [showFullDesc, setShowFullDesc] = useState(false); // State for description expansion
+  const [showFullDesc, setShowFullDesc] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editData, setEditData] = useState({
+    nome, marca, categoria, descricao,
+    ingredientes: ingredientes || descricao_ingredientes || '',
+    alergicos: alergicos || '',
+    atributos: { ...atributos },
+  });
+
+  const setAttr = (key, val) => setEditData(d => ({ ...d, atributos: { ...d.atributos, [key]: val } }));
+
+  const handleSave = () => {
+    // Mock save — in a real app this would call an API
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditData({
+      nome, marca, categoria, descricao,
+      ingredientes: ingredientes || descricao_ingredientes || '',
+      alergicos: alergicos || '',
+      atributos: { ...atributos },
+    });
+    setIsEditing(false);
+  };
+
   useEffect(() => {
     setMounted(true);
     const onKey = (e) => { if (e.key === 'Escape') onClose(); };
@@ -143,82 +168,130 @@ function Modal({ product, open, onClose, onFilterByBrand }) {
 
 
         <div className="flex flex-col">
-          {/* Content panel (left on desktop) */}
+          {/* Content panel */}
           <div className="overflow-y-auto max-h-[70vh] pr-2">
-            <div className='p-6 pb-0 flex flex-col-reverse md:flex-row gap-y-6'>
-              <div>
-                <h2 id="product-title" className="text-lg font-bold text-slate-900 leading-snug mb-1">{nome}</h2>
-                <div className="flex items-center gap-2 mb-2">
-                  {origem && origem.filter(o => o !== 'Importado').map((o, i) => (
-                    <span key={i} title={o} className="text-2xl leading-none">{ORIGIN_FLAGS[o] || '🏳️'}</span>
-                  ))}
-                  {categoria && <span className="text-xs text-slate-500">{categoria}</span>}
-                </div>
-                {marca && (
-                  <div
-                    className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3 cursor-pointer hover:underline"
-                    onClick={() => {
-                      if (onFilterByBrand) onFilterByBrand(marca);
-                      onClose();
-                    }}
-                  >
-                    {marca}
+            <div className='p-6 pb-0 flex flex-col-reverse md:flex-row gap-y-6 md:gap-x-6'>
+              <div className="flex-1">
+                {isEditing ? (
+                  <div className="flex flex-col gap-3 mb-4">
+                    <div>
+                      <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Nome</label>
+                      <input
+                        className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                        value={editData.nome}
+                        onChange={e => setEditData(d => ({ ...d, nome: e.target.value }))}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Marca</label>
+                        <input
+                          className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                          value={editData.marca || ''}
+                          onChange={e => setEditData(d => ({ ...d, marca: e.target.value }))}
+                        />
+                      </div>
+                      <div>
+                        <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Categoria</label>
+                        <select
+                          className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+                          value={editData.categoria || ''}
+                          onChange={e => setEditData(d => ({ ...d, categoria: e.target.value }))}
+                        >
+                          <option value="">—</option>
+                          {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Descrição</label>
+                      <textarea
+                        rows={3}
+                        className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                        value={editData.descricao || ''}
+                        onChange={e => setEditData(d => ({ ...d, descricao: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Ingredientes</label>
+                      <textarea
+                        rows={2}
+                        className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                        value={editData.ingredientes}
+                        onChange={e => setEditData(d => ({ ...d, ingredientes: e.target.value }))}
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Alérgicos</label>
+                      <textarea
+                        rows={2}
+                        className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                        value={editData.alergicos}
+                        onChange={e => setEditData(d => ({ ...d, alergicos: e.target.value }))}
+                      />
+                    </div>
                   </div>
+                ) : (
+                  <>
+                    <h2 id="product-title" className="text-lg font-bold text-slate-900 leading-snug mb-1">{nome}</h2>
+                    <div className="flex items-center gap-2 mb-2">
+                      {origem && origem.filter(o => o !== 'Importado').map((o, i) => (
+                        <span key={i} title={o} className="text-2xl leading-none">{ORIGIN_FLAGS[o] || '🏳️'}</span>
+                      ))}
+                      {categoria && <span className="text-xs text-slate-500">{categoria}</span>}
+                    </div>
+                    {marca && (
+                      <div
+                        className="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-3 cursor-pointer hover:underline"
+                        onClick={() => {
+                          if (onFilterByBrand) onFilterByBrand(marca);
+                          onClose();
+                        }}
+                      >
+                        {marca}
+                      </div>
+                    )}
+                    {descricao && (
+                      <div className="mb-3 text-sm text-slate-700 whitespace-pre-line">
+                        {(() => {
+                          const idxIng = descricao.indexOf('Ingredientes:');
+                          const idxAler = descricao.indexOf('Alérgicos:');
+                          let endIdx = -1;
+                          if (idxIng !== -1 && idxAler !== -1) endIdx = Math.min(idxIng, idxAler);
+                          else if (idxIng !== -1) endIdx = idxIng;
+                          else if (idxAler !== -1) endIdx = idxAler;
+                          const cleanDesc = endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
+                          const limit = 190;
+                          const isLong = cleanDesc.length > limit;
+                          if (!isLong || showFullDesc) {
+                            return (
+                              <>
+                                {cleanDesc}
+                                {isLong && (
+                                  <button onClick={() => setShowFullDesc(false)} className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap">Ver menos</button>
+                                )}
+                              </>
+                            );
+                          }
+                          return (
+                            <>
+                              {cleanDesc.slice(0, limit)}...
+                              <button onClick={() => setShowFullDesc(true)} className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap">Ver mais</button>
+                            </>
+                          );
+                        })()}
+                      </div>
+                    )}
+                    <div className="mb-4 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs text-slate-600">
+                      <div className="font-medium text-slate-700">Ingredientes:</div>
+                      <div>{(ingredientes || descricao_ingredientes || '').trim() ? (ingredientes || descricao_ingredientes) : 'Não informado'}</div>
+                      <div className="font-medium text-slate-700 mt-1">Alérgicos:</div>
+                      <div>{(alergicos || '').trim() ? alergicos : 'Não informado'}</div>
+                    </div>
+                  </>
                 )}
-                {descricao && (
-                  <div className="mb-3 text-sm text-slate-700 whitespace-pre-line">
-                    {(() => {
-                      // Remove everything after 'Ingredientes:' or 'Alérgicos:'
-                      const idxIng = descricao.indexOf('Ingredientes:');
-                      const idxAler = descricao.indexOf('Alérgicos:');
-                      let endIdx = -1;
-                      if (idxIng !== -1 && idxAler !== -1) {
-                        endIdx = Math.min(idxIng, idxAler);
-                      } else if (idxIng !== -1) {
-                        endIdx = idxIng;
-                      } else if (idxAler !== -1) {
-                        endIdx = idxAler;
-                      }
-                      const cleanDesc = endIdx !== -1 ? descricao.slice(0, endIdx).trim() : descricao;
-                      const limit = 190;
-                      const isLong = cleanDesc.length > limit;
-
-                      if (!isLong || showFullDesc) {
-                        return (
-                          <>
-                            {cleanDesc}
-                            {isLong && (
-                              <button
-                                onClick={() => setShowFullDesc(false)}
-                                className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap"
-                              >
-                                Ver menos
-                              </button>
-                            )}
-                          </>
-                        );
-                      }
-
-                      return (
-                        <>
-                          {cleanDesc.slice(0, limit)}...
-                          <button
-                            onClick={() => setShowFullDesc(true)}
-                            className="text-indigo-600 font-semibold hover:underline ml-1 text-xs whitespace-nowrap"
-                          >
-                            Ver mais
-                          </button>
-                        </>
-                      );
-                    })()}
-                  </div>
-                )}
-                <div className="mb-4 grid grid-cols-[auto,1fr] gap-x-3 gap-y-1 text-xs text-slate-600">
-                  <div className="font-medium text-slate-700">Ingredientes:</div>
-                  <div>{(ingredientes || descricao_ingredientes || '').trim() ? (ingredientes || descricao_ingredientes) : 'Não informado'}</div>
-                  <div className="font-medium text-slate-700 mt-1">Alérgicos:</div>
-                  <div>{(alergicos || '').trim() ? alergicos : 'Não informado'}</div>
-                </div>
               </div>
               <div>
                 <img src={getProxiedImage(imagem)} alt={nome} className="w-full min-w-[240px] h-48 md:h-60 object-contain rounded-xl shadow-sm" />
@@ -229,36 +302,65 @@ function Modal({ product, open, onClose, onFilterByBrand }) {
               <div className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Atributos</div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-x-16">
                 {[
-                  { key: 'leite_ou_derivados', label: 'Contém leite', icon: ATTR_ICONS.leite_ou_derivados, has: atributos.leite_ou_derivados, may: atributos.pode_conter_leite_ou_derivados },
-                  { key: 'contem_ovos', label: 'Contém ovos', icon: ATTR_ICONS.contem_ovos, has: atributos.contem_ovos, may: atributos.pode_conter_ovos },
-                  { key: 'contem_carne', label: 'Contém carne', icon: ATTR_ICONS.contem_carne, has: atributos.contem_carne, may: atributos.pode_conter_carne },
-                  { key: 'contem_gluten', label: 'Contém glúten', icon: ATTR_ICONS.contem_gluten, has: atributos.contem_gluten, may: atributos.pode_conter_gluten },
-                  { key: 'contem_soja', label: 'Contém soja', icon: ATTR_ICONS.contem_soja, has: atributos.contem_soja, may: atributos.pode_conter_soja },
-                  { key: 'contem_amendoim', label: 'Contém amendoim', icon: ATTR_ICONS.contem_amendoim, has: atributos.contem_amendoim, may: atributos.pode_conter_amendoim },
-                  { key: 'contem_castanhas', label: 'Contém castanhas', icon: ATTR_ICONS.contem_castanhas, has: atributos.contem_castanhas, may: atributos.pode_conter_castanhas },
-                  { key: 'contem_peixe', label: 'Contém peixe', icon: ATTR_ICONS.contem_peixe, has: atributos.contem_peixe, may: atributos.pode_conter_peixe },
-                  { key: 'contem_crustaceos', label: 'Contém crustáceos', icon: ATTR_ICONS.contem_crustaceos, has: atributos.contem_crustaceos, may: atributos.pode_conter_crustaceos },
-                  { key: 'origem_animal', label: 'Origem animal', icon: ATTR_ICONS.origem_animal, has: atributos.origem_animal, may: atributos.pode_conter_origem_animal },
-                ].map(({ key, label, icon, has, may }) => {
+                  { hasKey: 'leite_ou_derivados', mayKey: 'pode_conter_leite_ou_derivados', label: 'Contém leite', icon: ATTR_ICONS.leite_ou_derivados },
+                  { hasKey: 'contem_ovos', mayKey: 'pode_conter_ovos', label: 'Contém ovos', icon: ATTR_ICONS.contem_ovos },
+                  { hasKey: 'contem_carne', mayKey: 'pode_conter_carne', label: 'Contém carne', icon: ATTR_ICONS.contem_carne },
+                  { hasKey: 'contem_gluten', mayKey: 'pode_conter_gluten', label: 'Contém glúten', icon: ATTR_ICONS.contem_gluten },
+                  { hasKey: 'contem_soja', mayKey: 'pode_conter_soja', label: 'Contém soja', icon: ATTR_ICONS.contem_soja },
+                  { hasKey: 'contem_amendoim', mayKey: 'pode_conter_amendoim', label: 'Contém amendoim', icon: ATTR_ICONS.contem_amendoim },
+                  { hasKey: 'contem_castanhas', mayKey: 'pode_conter_castanhas', label: 'Contém castanhas', icon: ATTR_ICONS.contem_castanhas },
+                  { hasKey: 'contem_peixe', mayKey: 'pode_conter_peixe', label: 'Contém peixe', icon: ATTR_ICONS.contem_peixe },
+                  { hasKey: 'contem_crustaceos', mayKey: 'pode_conter_crustaceos', label: 'Contém crustáceos', icon: ATTR_ICONS.contem_crustaceos },
+                  { hasKey: 'origem_animal', mayKey: 'pode_conter_origem_animal', label: 'Origem animal', icon: ATTR_ICONS.origem_animal },
+                ].map(({ hasKey, mayKey, label, icon }) => {
+                  const src = isEditing ? editData.atributos : atributos;
+                  const has = src[hasKey];
+                  const may = src[mayKey];
                   let value = '';
-                  if (unknown) value = '?';
+                  if (unknown && !isEditing) value = '?';
                   else if (has === true) value = 'sim';
                   else if (may === true) value = 'talvez';
                   else value = 'não';
-                  let type = unknown ? 'traces': has === true ? 'contains' : may === true ? 'traces' : 'free';
-                  return (
-                    <AttributeRow key={key} icon={icon} name={label} value={value} type={type} />
-                  );
+                  const type = (unknown && !isEditing) ? 'traces' : has === true ? 'contains' : may === true ? 'traces' : 'free';
+
+                  if (isEditing) {
+                    const cycle = () => {
+                      if (has === true) { setAttr(hasKey, false); setAttr(mayKey, true); }        // sim → talvez
+                      else if (may === true) { setAttr(hasKey, false); setAttr(mayKey, false); }  // talvez → não
+                      else { setAttr(hasKey, true); setAttr(mayKey, false); }                     // não → sim
+                    };
+                    return (
+                      <button key={hasKey} onClick={cycle} className="flex items-center justify-between gap-3 text-sm py-1 w-full text-left hover:bg-slate-50 rounded-lg px-1 transition cursor-pointer">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="shrink-0">{icon}</span>
+                          <span className="font-medium text-slate-700 truncate">{label}</span>
+                        </div>
+                        <ValueBadge type={type}>{value}</ValueBadge>
+                      </button>
+                    );
+                  }
+                  return <AttributeRow key={hasKey} icon={icon} name={label} value={value} type={type} />;
                 })}
               </div>
             </div>
 
-            <div className="pb-2 flex flex-col items-end pr-4 gap-2 sticky bottom-0 pt-3 bg-white z-10 border-t border-slate-200 bg-white">
-              <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
-                Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
-              </a>
-              {/* Disclaimer discreto, amarelo, no footer */}
-              <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 text-center font-normal opacity-80">
+            <div className="pb-2 flex flex-col items-end pr-4 gap-2 sticky bottom-0 pt-3 bg-white z-10 border-t border-slate-200">
+              {isEditing ? (
+                <div className="flex items-center gap-2 w-full justify-end">
+                  <button onClick={handleCancel} className="text-sm px-4 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition">Cancelar</button>
+                  <button onClick={handleSave} className="text-sm px-4 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">Salvar</button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 w-full justify-between">
+                  <button onClick={() => setIsEditing(true)} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    ✏️ Editar produto
+                  </button>
+                  <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
+                    Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
+                  </a>
+                </div>
+              )}
+              <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 text-center font-normal opacity-80 w-full">
                 Sempre confira o rótulo do produto antes de consumir — as informações podem estar desatualizadas e formulações mudam sem aviso.
               </div>
             </div>
@@ -269,7 +371,7 @@ function Modal({ product, open, onClose, onFilterByBrand }) {
   );
 }
 
-export default function ProductCard({ product, onFilterByBrand }) {
+export default function ProductCard({ product, categories, onFilterByBrand }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { nome, imagem, marca, descricao, url, origem, atributos, alergicos, ingredientes, descricao_ingredientes } = product;
 
@@ -447,7 +549,7 @@ export default function ProductCard({ product, onFilterByBrand }) {
           </div>
         </div>
       </button>
-      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} onFilterByBrand={onFilterByBrand} />}
+      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} onFilterByBrand={onFilterByBrand} categories={categories} />}
     </>
   );
 }
