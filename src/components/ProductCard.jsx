@@ -163,7 +163,12 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
         className={`relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden transform transition-all duration-200 ease-out ${mounted ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'} max-h-[90vh]`}
         role="dialog" aria-modal="true" aria-labelledby="product-title" onClick={e => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-3 right-3 inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition" aria-label="Fechar">✕</button>
+        <div className="absolute top-3 right-3 flex items-center gap-2">
+          {!isEditing && (
+            <button onClick={() => setIsEditing(true)} className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition text-sm" aria-label="Editar">✏️</button>
+          )}
+          <button onClick={onClose} className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition" aria-label="Fechar">✕</button>
+        </div>
 
 
 
@@ -351,14 +356,9 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
                   <button onClick={handleSave} className="text-sm px-4 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition">Salvar</button>
                 </div>
               ) : (
-                <div className="flex items-center gap-3 w-full justify-between">
-                  <button onClick={() => setIsEditing(true)} className="text-xs px-3 py-1.5 rounded-lg border border-slate-200 text-slate-500 hover:bg-slate-50 transition flex items-center gap-1.5">
-                    ✏️ Editar produto
-                  </button>
-                  <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
-                    Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
-                  </a>
-                </div>
+                <a href={url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-indigo-700 hover:underline text-sm font-medium">
+                  Ver no <img src={santaluzia} alt="Santa Luzia" className="h-10" />
+                </a>
               )}
               <div className="mt-2 text-[11px] text-amber-700 bg-amber-50 border border-amber-100 rounded px-2 py-1 text-center font-normal opacity-80 w-full">
                 Sempre confira o rótulo do produto antes de consumir — as informações podem estar desatualizadas e formulações mudam sem aviso.
