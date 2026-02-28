@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 // import produtos from './content/produtos.json'; // carregado dinamicamente abaixo
 import Filters from './components/Filters';
 import ProductCard from './components/ProductCard';
+import { useAdmin } from './hooks/useAdmin';
 
 const ATTRIBUTE_CHIPS = [
   { key: 'sem_leite', label: 'Sem leite' },
@@ -68,6 +69,7 @@ export default function App() {
     return parsed;
   }
 
+  const { isAdmin, token, login, logout } = useAdmin();
   const [filters, setFilters] = useState(() => parseFiltersFromURL());
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,12 +93,23 @@ export default function App() {
     document.title = title;
   }, [filters]);
 
+  const [companies, setCompanies] = useState([]);
+  const [categories, setCategories] = useState([]);
+
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    import('./content/produtos.json')
-      .then(mod => {
-        if (!cancelled) setProdutos(mod.default || mod);
+    Promise.all([
+      fetch(`${API}/products?limit=9999`).then(r => r.json()),
+      fetch(`${API}/products/filters`).then(r => r.json()),
+    ])
+      .then(([productsRes, filtersRes]) => {
+        if (cancelled) return;
+        setProdutos(productsRes.data || []);
+        setCompanies(filtersRes.brands || []);
+        setCategories(filtersRes.categories || []);
       })
       .catch(err => {
         console.error('Erro ao carregar produtos:', err);
@@ -106,17 +119,8 @@ export default function App() {
         if (!cancelled) setLoading(false);
       });
     return () => { cancelled = true; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const companies = useMemo(() => {
-    const set = new Set(produtos.map(p => p.marca).filter(Boolean));
-    return [...set].sort();
-  }, [produtos]);
-
-  const categories = useMemo(() => {
-    const set = new Set(produtos.map(p => p.categoria).filter(Boolean));
-    return [...set].sort();
-  }, [produtos]);
 
   const filtered = useMemo(() => {
     return produtos.filter(p => {
@@ -351,6 +355,8 @@ export default function App() {
                   key={p.slug}
                   product={p}
                   categories={categories}
+                  isAdmin={isAdmin}
+                  token={token}
                   onFilterByBrand={(brand) => setFilters(prev => ({ ...prev, empresa: brand, categoria: '' }))}
                 />
               ))}
@@ -367,6 +373,11 @@ export default function App() {
             <strong className="text-slate-700">Sempre confira o rótulo do produto</strong> antes de consumir — as informações podem estar desatualizadas e formulações mudam sem aviso.
           </p>
         </div>
+        <button
+          onClick={isAdmin ? logout : login}
+          className={`absolute bottom-3 right-3 text-[10px] transition select-none ${isAdmin ? "text-green-600 hover:text-green-800" : "text-slate-400 hover:text-slate-600"}`}
+          title={isAdmin ? 'Sair' : 'Admin'}
+        >{isAdmin ? '● admin' : 'admin'}</button>
       </footer>
     </div>
   );

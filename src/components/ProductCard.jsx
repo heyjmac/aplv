@@ -105,7 +105,7 @@ function AttributeRow({ icon, name, value, type }) {
   );
 }
 
-function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
+function Modal({ product, open, onClose, onFilterByBrand, categories = [], isAdmin = false, token = null }) {
   const { nome, imagem, marca, categoria, descricao, url, origem, ingredientes, descricao_ingredientes, alergicos, atributos } = product;
   const [mounted, setMounted] = useState(false);
   const [showFullDesc, setShowFullDesc] = useState(false);
@@ -119,8 +119,26 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
 
   const setAttr = (key, val) => setEditData(d => ({ ...d, atributos: { ...d.atributos, [key]: val } }));
 
-  const handleSave = () => {
-    // Mock save — in a real app this would call an API
+  const handleSave = async () => {
+    const API = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+    try {
+      await fetch(`${API}/products/${product.slug}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify({
+          nome: editData.nome,
+          marca: editData.marca,
+          categoria: editData.categoria,
+          descricao: editData.descricao,
+          ingredientes: editData.ingredientes,
+          alergicos: editData.alergicos,
+          atributos: editData.atributos,
+        }),
+      });
+    } catch { /* silently ignore network errors */ }
     setIsEditing(false);
   };
 
@@ -164,7 +182,7 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
         role="dialog" aria-modal="true" aria-labelledby="product-title" onClick={e => e.stopPropagation()}
       >
         <div className="absolute top-3 right-3 flex items-center gap-2">
-          {!isEditing && (
+          {isAdmin && !isEditing && (
             <button onClick={() => setIsEditing(true)} className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition text-sm" aria-label="Editar">✏️</button>
           )}
           <button onClick={onClose} className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition" aria-label="Fechar">✕</button>
@@ -371,7 +389,7 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [] }) {
   );
 }
 
-export default function ProductCard({ product, categories, onFilterByBrand }) {
+export default function ProductCard({ product, categories, isAdmin, token, onFilterByBrand }) {
   const [modalOpen, setModalOpen] = useState(false);
   const { nome, imagem, marca, descricao, url, origem, atributos, alergicos, ingredientes, descricao_ingredientes } = product;
 
@@ -549,7 +567,7 @@ export default function ProductCard({ product, categories, onFilterByBrand }) {
           </div>
         </div>
       </button>
-      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} onFilterByBrand={onFilterByBrand} categories={categories} />}
+      {modalOpen && <Modal product={product} open={modalOpen} onClose={() => setModalOpen(false)} onFilterByBrand={onFilterByBrand} categories={categories} isAdmin={isAdmin} token={token} />}
     </>
   );
 }
