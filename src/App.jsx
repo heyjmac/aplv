@@ -74,6 +74,7 @@ export default function App() {
   const [produtos, setProdutos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [showAddProduct, setShowAddProduct] = useState(false);
 
   // Dynamic title based on filters
   useEffect(() => {
@@ -98,27 +99,28 @@ export default function App() {
 
   const API = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadProducts = () => {
     setLoading(true);
     Promise.all([
       fetch(`${API}/products?limit=9999`).then(r => r.json()),
       fetch(`${API}/products/filters`).then(r => r.json()),
     ])
       .then(([productsRes, filtersRes]) => {
-        if (cancelled) return;
         setProdutos(productsRes.data || []);
         setCompanies(filtersRes.brands || []);
         setCategories(filtersRes.categories || []);
       })
       .catch(err => {
         console.error('Erro ao carregar produtos:', err);
-        if (!cancelled) setError('Falha ao carregar produtos');
+        setError('Falha ao carregar produtos');
       })
       .finally(() => {
-        if (!cancelled) setLoading(false);
+        setLoading(false);
       });
-    return () => { cancelled = true; };
+  };
+
+  useEffect(() => {
+    loadProducts();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -232,6 +234,14 @@ export default function App() {
 
           {/* Search + count */}
           <div className="flex items-center gap-2 flex-1 justify-end max-w-xs">
+            {isAdmin && (
+              <button
+                onClick={() => setShowAddProduct(true)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition shrink-0"
+              >
+                + Produto
+              </button>
+            )}
             <div className="relative flex-1">
               <input
                 type="text"
@@ -379,6 +389,295 @@ export default function App() {
           title={isAdmin ? 'Sair' : 'Admin'}
         >{isAdmin ? '● admin' : 'admin'}</button>
       </footer>
+
+      {/* Add Product Modal */}
+      {showAddProduct && (
+        <AddProductModal
+          open={showAddProduct}
+          onClose={() => setShowAddProduct(false)}
+          categories={categories}
+          token={token}
+          onProductAdded={loadProducts}
+          API={API}
+        />
+      )}
+    </div>
+  );
+}
+
+function AddProductModal({ open, onClose, categories, token, onProductAdded, API }) {
+  const [mounted, setMounted] = useState(false);
+  const [newProduct, setNewProduct] = useState({
+    nome: '',
+    marca: '',
+    categoria: '',
+    descricao: '',
+    imagem: '',
+    url: '',
+    ingredientes: '',
+    alergicos: '',
+    atributos: {
+      leite_ou_derivados: false,
+      pode_conter_leite_ou_derivados: false,
+      contem_ovos: false,
+      pode_conter_ovos: false,
+      contem_carne: false,
+      pode_conter_carne: false,
+      contem_gluten: false,
+      pode_conter_gluten: false,
+      contem_soja: false,
+      pode_conter_soja: false,
+      contem_amendoim: false,
+      pode_conter_amendoim: false,
+      contem_castanhas: false,
+      pode_conter_castanhas: false,
+      contem_peixe: false,
+      pode_conter_peixe: false,
+      contem_crustaceos: false,
+      pode_conter_crustaceos: false,
+      origem_animal: false,
+      pode_conter_origem_animal: false,
+    },
+  });
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const onKey = (e) => { if (e.key === 'Escape') onClose(); };
+    document.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
+  const setAttr = (key, val) => setNewProduct(d => ({ ...d, atributos: { ...d.atributos, [key]: val } }));
+
+  const handleSave = async () => {
+    if (!newProduct.nome.trim()) {
+      alert('Nome do produto é obrigatório');
+      return;
+    }
+    setSaving(true);
+    try {
+      const response = await fetch(`${API}/products`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: JSON.stringify(newProduct),
+      });
+      if (response.ok) {
+        onProductAdded();
+        onClose();
+      } else {
+        alert('Erro ao criar produto');
+      }
+    } catch (err) {
+      console.error('Erro ao criar produto:', err);
+      alert('Erro ao criar produto');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const ATTR_ICONS = {
+    leite_ou_derivados: '🥛',
+    contem_ovos: '🥚',
+    contem_carne: '🥩',
+    contem_gluten: '🌾',
+    contem_soja: '🫘',
+    contem_amendoim: '🥜',
+    contem_castanhas: '🌰',
+    contem_peixe: '🐟',
+    contem_crustaceos: '🦐',
+    origem_animal: '🐾',
+  };
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm transition-opacity ${mounted ? 'opacity-100' : 'opacity-0'}`}
+      onClick={onClose}
+    >
+      <div
+        className={`relative w-full max-w-3xl bg-white rounded-2xl shadow-2xl ring-1 ring-black/5 overflow-hidden transform transition-all duration-200 ease-out ${mounted ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-2 scale-95'} max-h-[90vh] overflow-y-auto`}
+        role="dialog"
+        aria-modal="true"
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="sticky top-0 bg-white border-b border-slate-200 px-6 py-4 z-10">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-bold text-slate-900">Adicionar Novo Produto</h2>
+            <button
+              onClick={onClose}
+              className="inline-flex items-center justify-center w-9 h-9 rounded-full border border-slate-200 text-slate-500 hover:text-slate-700 hover:bg-slate-50 transition"
+              aria-label="Fechar"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="flex flex-col gap-3 mb-6">
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Nome *</label>
+              <input
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                value={newProduct.nome}
+                onChange={e => setNewProduct(d => ({ ...d, nome: e.target.value }))}
+                placeholder="Nome do produto"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Marca</label>
+                <input
+                  className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                  value={newProduct.marca}
+                  onChange={e => setNewProduct(d => ({ ...d, marca: e.target.value }))}
+                  placeholder="Marca"
+                />
+              </div>
+              <div>
+                <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Categoria</label>
+                <select
+                  className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+                  value={newProduct.categoria}
+                  onChange={e => setNewProduct(d => ({ ...d, categoria: e.target.value }))}
+                >
+                  <option value="">—</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">URL do Produto</label>
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                value={newProduct.url}
+                onChange={e => setNewProduct(d => ({ ...d, url: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Imagem URL</label>
+              <input
+                type="text"
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                value={newProduct.imagem}
+                onChange={e => setNewProduct(d => ({ ...d, imagem: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Descrição</label>
+              <textarea
+                rows={3}
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                value={newProduct.descricao}
+                onChange={e => setNewProduct(d => ({ ...d, descricao: e.target.value }))}
+                placeholder="Descrição do produto"
+              />
+            </div>
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Ingredientes</label>
+              <textarea
+                rows={2}
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                value={newProduct.ingredientes}
+                onChange={e => setNewProduct(d => ({ ...d, ingredientes: e.target.value }))}
+                placeholder="Lista de ingredientes"
+              />
+            </div>
+            <div>
+              <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Alérgicos</label>
+              <textarea
+                rows={2}
+                className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 resize-none"
+                value={newProduct.alergicos}
+                onChange={e => setNewProduct(d => ({ ...d, alergicos: e.target.value }))}
+                placeholder="Informações sobre alérgicos"
+              />
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <div className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest mb-2">Atributos</div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {[
+                { hasKey: 'leite_ou_derivados', mayKey: 'pode_conter_leite_ou_derivados', label: 'Contém leite', icon: ATTR_ICONS.leite_ou_derivados },
+                { hasKey: 'contem_ovos', mayKey: 'pode_conter_ovos', label: 'Contém ovos', icon: ATTR_ICONS.contem_ovos },
+                { hasKey: 'contem_carne', mayKey: 'pode_conter_carne', label: 'Contém carne', icon: ATTR_ICONS.contem_carne },
+                { hasKey: 'contem_gluten', mayKey: 'pode_conter_gluten', label: 'Contém glúten', icon: ATTR_ICONS.contem_gluten },
+                { hasKey: 'contem_soja', mayKey: 'pode_conter_soja', label: 'Contém soja', icon: ATTR_ICONS.contem_soja },
+                { hasKey: 'contem_amendoim', mayKey: 'pode_conter_amendoim', label: 'Contém amendoim', icon: ATTR_ICONS.contem_amendoim },
+                { hasKey: 'contem_castanhas', mayKey: 'pode_conter_castanhas', label: 'Contém castanhas', icon: ATTR_ICONS.contem_castanhas },
+                { hasKey: 'contem_peixe', mayKey: 'pode_conter_peixe', label: 'Contém peixe', icon: ATTR_ICONS.contem_peixe },
+                { hasKey: 'contem_crustaceos', mayKey: 'pode_conter_crustaceos', label: 'Contém crustáceos', icon: ATTR_ICONS.contem_crustaceos },
+                { hasKey: 'origem_animal', mayKey: 'pode_conter_origem_animal', label: 'Origem animal', icon: ATTR_ICONS.origem_animal },
+              ].map(({ hasKey, mayKey, label, icon }) => {
+                const has = newProduct.atributos[hasKey];
+                const may = newProduct.atributos[mayKey];
+                let value = '';
+                if (has === true) value = 'sim';
+                else if (may === true) value = 'talvez';
+                else value = 'não';
+                const type = has === true ? 'contains' : may === true ? 'traces' : 'free';
+
+                const cycle = () => {
+                  if (has === true) { setAttr(hasKey, false); setAttr(mayKey, true); }        // sim → talvez
+                  else if (may === true) { setAttr(hasKey, false); setAttr(mayKey, false); }  // talvez → não
+                  else { setAttr(hasKey, true); setAttr(mayKey, false); }                     // não → sim
+                };
+
+                const colorClass = type === 'free' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : type === 'contains' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-700 border-amber-100';
+
+                return (
+                  <button
+                    key={hasKey}
+                    onClick={cycle}
+                    className="flex items-center justify-between gap-3 text-sm py-2 px-3 w-full text-left hover:bg-slate-50 rounded-lg border border-slate-200 transition cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className="shrink-0">{icon}</span>
+                      <span className="font-medium text-slate-700 truncate text-xs">{label}</span>
+                    </div>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium border ${colorClass}`}>
+                      {value}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="sticky bottom-0 bg-white border-t border-slate-200 px-6 py-4 z-10">
+          <div className="flex items-center gap-2 justify-end">
+            <button
+              onClick={onClose}
+              disabled={saving}
+              className="text-sm px-4 py-1.5 rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 transition disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="text-sm px-4 py-1.5 rounded-lg bg-indigo-600 text-white font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
+            >
+              {saving ? 'Salvando...' : 'Criar Produto'}
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
