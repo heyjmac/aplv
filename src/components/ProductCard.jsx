@@ -111,7 +111,7 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [], isAdm
   const [showFullDesc, setShowFullDesc] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editData, setEditData] = useState({
-    nome, marca, categoria, descricao,
+    nome, marca, categoria, descricao, imagem,
     ingredientes: ingredientes || descricao_ingredientes || '',
     alergicos: alergicos || '',
     atributos: { ...atributos },
@@ -133,6 +133,7 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [], isAdm
           marca: editData.marca,
           categoria: editData.categoria,
           descricao: editData.descricao,
+          imagem: editData.imagem,
           ingredientes: editData.ingredientes,
           alergicos: editData.alergicos,
           atributos: editData.atributos,
@@ -144,7 +145,7 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [], isAdm
 
   const handleCancel = () => {
     setEditData({
-      nome, marca, categoria, descricao,
+      nome, marca, categoria, descricao, imagem,
       ingredientes: ingredientes || descricao_ingredientes || '',
       alergicos: alergicos || '',
       atributos: { ...atributos },
@@ -317,7 +318,19 @@ function Modal({ product, open, onClose, onFilterByBrand, categories = [], isAdm
                 )}
               </div>
               <div>
-                <img src={getProxiedImage(imagem)} alt={nome} className="w-full min-w-[240px] h-48 md:h-60 object-contain rounded-xl shadow-sm" />
+                <img src={getProxiedImage(isEditing ? editData.imagem : imagem)} alt={nome} className="w-full min-w-[240px] h-48 md:h-60 object-contain rounded-xl shadow-sm" />
+                {isEditing && (
+                  <div className="mt-3">
+                    <label className="text-[0.65rem] font-bold text-slate-400 uppercase tracking-widest block mb-1">Imagem URL</label>
+                    <input
+                      type="text"
+                      className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                      value={editData.imagem || ''}
+                      onChange={e => setEditData(d => ({ ...d, imagem: e.target.value }))}
+                      placeholder="https://example.com/image.jpg"
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
