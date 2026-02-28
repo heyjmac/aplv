@@ -245,7 +245,6 @@ export default function App() {
                 </button>
               )}
             </div>
-            <span className="text-xs text-slate-400 shrink-0 hidden sm:inline">{filtered.length}/{produtos.length}</span>
           </div>
         </div>
 
